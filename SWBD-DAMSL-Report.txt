@@ -1,0 +1,69 @@
+
+Assignment 2 Report
+
+Name: Siddharth Dekhane
+
+
+1. Describe how you evaluated your baseline and advanced features:
+
+    • I started with moving 25% of the dataset (269 files) to the test folder and keeping remaining (807 files) for training the model
+    • I created 4 other random train-test (75%-25%) datasets to test my improvements on.
+    • I also tried implementing k-fold cross-validation, just to ensure that my advanced features improve accuracy for every dataset and not just for the current one
+
+
+
+2. Accuracy of baseline features during your evaluation:
+
+    • Dataset:
+        Test Folder : 0270.csv - 0529.csv
+        Train Folder : All remaining
+        Accuracy : 73.34733041618429 % (For this dataset)
+    • Average Accuracy : ~72.7751 % (For all 5 datasets)
+
+
+
+3. Describe your advanced feature set:
+
+    • Retained all the baseline features, except "NO_WORDS" if Pos tag is not present.
+    • Implemented a quad-gram model (The context for 3 previous dialogs are stored in the current feature vector)
+    • "SubSequenceNumber" = Maintaned a track of continuous sentences a speaker speaks without interference from the other speaker
+    • "DialogNumber" = Kept a record of total dialogs for each speaker (Multiple utterances by same speaker are couted as 1 utterance)
+    • The annotation mannual (https://web.stanford.edu/~jurafsky/ws97/manual.august1.html) states :
+        "/"      = end of complete unit
+        "-/"     = end of cut-off unit
+        Neither  = unit continues to next turn by same speaker
+      To accomodate this into the feature, I've added last 3 words (i.e the end of every utterance) into the feature set, referred as "lastwords"
+    • The advanced features with respect to above observation are :
+        "isEndWithHyphen" = Checks which utterances end with "-/" or "- /"
+        "isEndWithSlash" = Checks which utterances end with " /"
+        "isQuestion" = Identifies if the current utterance is a question (has a "?") or not
+        "lastwords" = Finds the end characters of each utterance
+    • The current features also stores advanced feature of 3 previous utterances. History features include:
+        PosTags, isEndWithHyphen, isEndWithSlash, isQuestion, lastwords, POS_NONE if empty
+    • CountOfPos : This maintains the count of each PosTag encountered in the dialog
+    • For utterance without any pos tags, instead of "NO_WORDS", use dialog text as the token and used "POS_TEXT" as the pos tag
+    • Added an feature if an utterance is not a "FirstUtterance" which acts as a bias to all non-first utterances in the dialogue
+
+
+
+4. If you tried and rejected alternate advanced feature sets, please describe them:
+
+    • Implemented n-gram model (n = 1,2,3,4,5). Discarded n=1,2,3,5.
+    • Tried converting all tokens to lowercase to maintain uniformity
+    • Tried to identify if an utterance is an exclamation and add "isExclamation" as a feature
+    • Similar to "FirstUtterance", tried adding "LastUtterance" to the feature
+    • Tried adding advanced features for next (upcoming) utterance as a feature
+    • Tried to ignore basic punctuations like ","  "." from the POS
+    • Tried to add length of text/tokens in the current utterance as a feature
+
+    All the above ideas degraded the performance on majority of the datasets and thus were rejected
+
+
+
+5. Accuracy of advanced features was:
+
+    • Dataset:
+        Test Folder : 0270.csv - 0529.csv
+        Train Folder : All remaining
+        Accuracy : 78.32545179836352 % (For this dataset)
+    • Average Accuracy : ~77.7781 % (For all 5 datasets)
